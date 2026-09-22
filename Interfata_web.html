@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sistem de Monitorizare Video</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #0f172a;
+
+            color: white;
+
+            min-height: 100vh;
+        }
+
+
+        /* =========================
+           HEADER
+           ========================= */
+
+        header {
+
+            background: #111827;
+
+            padding: 20px 30px;
+
+            border-bottom:
+                1px solid #334155;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 20px;
+        }
+
+
+        .header-title h1 {
+
+            font-size: 26px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .header-title p {
+
+            color: #94a3b8;
+
+            font-size: 14px;
+        }
+
+
+        .system-status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            background: #1e293b;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+        }
+
+
+        .status-dot {
+
+            width: 10px;
+
+            height: 10px;
+
+            border-radius: 50%;
+
+            background: #64748b;
+        }
+
+
+        .status-dot.active {
+
+            background: #22c55e;
+        }
+
+
+        /* =========================
+           MAIN
+           ========================= */
+
+        main {
+
+            padding: 25px;
+
+            max-width: 1600px;
+
+            margin: auto;
+        }
+
+
+        .dashboard {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+
+        /* =========================
+           CAMERA CARD
+           ========================= */
+
+        .camera-card {
+
+            background: #1e293b;
+
+            border:
+                1px solid #334155;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0, 0, 0, 0.25);
+        }
+
+
+        .camera-header {
+
+            padding: 14px 18px;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            background: #172033;
+
+            border-bottom:
+                1px solid #334155;
+        }
+
+
+        .camera-name {
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .camera-status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+
+        .camera-status-dot {
+
+            width: 9px;
+
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: #ef4444;
+        }
+
+
+        .camera-status.online {
+
+            color: #22c55e;
+        }
+
+
+        .camera-status.online
+        .camera-status-dot {
+
+            background: #22c55e;
+        }
+
+
+        .camera-status.offline {
+
+            color: #ef4444;
+        }
+
+
+        /* =========================
+           VIDEO
+           ========================= */
+
+        .video-container {
+
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 4 / 3;
+
+            background: #020617;
+
+            overflow: hidden;
+        }
+
+
+        .camera-stream {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+
+        .offline-message {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: none;
+
+            justify-content: center;
+
+            align-items: center;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            background: #020617;
+
+            color: #94a3b8;
+
+            text-align: center;
+        }
+
+
+        .offline-message .icon {
+
+            font-size: 35px;
+        }
+
+
+        .offline-message strong {
+
+            color: white;
+        }
+
+
+        /* =========================
+           CAMERA INFO
+           ========================= */
+
+        .camera-info {
+
+            padding: 12px 18px;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 10px;
+
+            color: #94a3b8;
+
+            font-size: 13px;
+
+            background: #172033;
+        }
+
+
+        .camera-ip {
+
+            font-family:
+                monospace;
+        }
+
+
+        .pir-status {
+
+            color: #22c55e;
+        }
+
+
+        /* =========================
+           FOOTER
+           ========================= */
+
+        footer {
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            padding: 25px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+           ========================= */
+
+        @media (max-width: 900px) {
+
+            .dashboard {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+        }
+
+
+        @media (max-width: 500px) {
+
+            main {
+
+                padding: 12px;
+            }
+
+
+            .camera-info {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+
+            .header-title h1 {
+
+                font-size: 21px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
+
+<header>
+
+    <div class="header-title">
+
+        <h1>
+            📹 Sistem de Monitorizare Video
+        </h1>
+
+        <p>
+            ESP32-CAM • Monitorizare în timp real • 4 camere
+        </p>
+
+    </div>
+
+
+    <div class="system-status">
+
+        <div
+            class="status-dot active"
+            id="systemDot">
+        </div>
+
+        <span id="systemStatus">
+            Sistem activ
+        </span>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+     ===================================================== -->
+
+<main>
+
+    <div class="dashboard">
+
+
+        <!-- =================================================
+             CAMERA 1
+             ================================================= -->
+
+        <div class="camera-card">
+
+            <div class="camera-header">
+
+                <div class="camera-name">
+                    📷 Camera 1
+                </div>
+
+
+                <div
+                    class="camera-status offline"
+                    id="status1">
+
+                    <div
+                        class="camera-status-dot">
+                    </div>
+
+                    <span>
+                        OFFLINE
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="video-container">
+
+                <img
+                    id="camera1"
+                    class="camera-stream"
+                    src="http://10.106.32.152/stream"
+                    alt="Camera 1"
+                    onload="cameraOnline(1)"
+                    onerror="cameraOffline(1)"
+                >
+
+
+                <div
+                    class="offline-message"
+                    id="offline1">
+
+                    <div class="icon">
+                        📡
+                    </div>
+
+                    <strong>
+                        Camera 1 offline
+                    </strong>
+
+                    <span>
+                        Se încearcă reconectarea...
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="camera-info">
+
+                <span class="camera-ip">
+                    IP: 10.106.32.152
+                </span>
+
+                <span class="pir-status">
+                    ● PIR activ
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CAMERA 2
+             ================================================= -->
+
+        <div class="camera-card">
+
+            <div class="camera-header">
+
+                <div class="camera-name">
+                    📷 Camera 2
+                </div>
+
+
+                <div
+                    class="camera-status offline"
+                    id="status2">
+
+                    <div
+                        class="camera-status-dot">
+                    </div>
+
+                    <span>
+                        OFFLINE
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="video-container">
+
+                <img
+                    id="camera2"
+                    class="camera-stream"
+                    src="http://10.106.32.37/stream"
+                    alt="Camera 2"
+                    onload="cameraOnline(2)"
+                    onerror="cameraOffline(2)"
+                >
+
+
+                <div
+                    class="offline-message"
+                    id="offline2">
+
+                    <div class="icon">
+                        📡
+                    </div>
+
+                    <strong>
+                        Camera 2 offline
+                    </strong>
+
+                    <span>
+                        Se încearcă reconectarea...
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="camera-info">
+
+                <span class="camera-ip">
+                    IP: 10.106.32.37
+                </span>
+
+                <span class="pir-status">
+                    ● PIR activ
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CAMERA 3
+             ================================================= -->
+
+        <div class="camera-card">
+
+            <div class="camera-header">
+
+                <div class="camera-name">
+                    📷 Camera 3
+                </div>
+
+
+                <div
+                    class="camera-status offline"
+                    id="status3">
+
+                    <div
+                        class="camera-status-dot">
+                    </div>
+
+                    <span>
+                        OFFLINE
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="video-container">
+
+                <img
+                    id="camera3"
+                    class="camera-stream"
+                    src="http://10.106.32.134/stream"
+                    alt="Camera 3"
+                    onload="cameraOnline(3)"
+                    onerror="cameraOffline(3)"
+                >
+
+
+                <div
+                    class="offline-message"
+                    id="offline3">
+
+                    <div class="icon">
+                        📡
+                    </div>
+
+                    <strong>
+                        Camera 3 offline
+                    </strong>
+
+                    <span>
+                        Se încearcă reconectarea...
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="camera-info">
+
+                <span class="camera-ip">
+                    IP: 10.106.32.134
+                </span>
+
+                <span class="pir-status">
+                    ● PIR activ
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CAMERA 4
+             ================================================= -->
+
+        <div class="camera-card">
+
+            <div class="camera-header">
+
+                <div class="camera-name">
+                    📷 Camera 4
+                </div>
+
+
+                <div
+                    class="camera-status offline"
+                    id="status4">
+
+                    <div
+                        class="camera-status-dot">
+                    </div>
+
+                    <span>
+                        OFFLINE
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="video-container">
+
+                <img
+                    id="camera4"
+                    class="camera-stream"
+                    src="http://10.106.32.107/stream"
+                    alt="Camera 4"
+                    onload="cameraOnline(4)"
+                    onerror="cameraOffline(4)"
+                >
+
+
+                <div
+                    class="offline-message"
+                    id="offline4">
+
+                    <div class="icon">
+                        📡
+                    </div>
+
+                    <strong>
+                        Camera 4 offline
+                    </strong>
+
+                    <span>
+                        Se încearcă reconectarea...
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="camera-info">
+
+                <span class="camera-ip">
+                    IP: 10.106.32.107
+                </span>
+
+                <span class="pir-status">
+                    ● PIR activ
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+
+<footer>
+
+    Sistem de monitorizare video cu ESP32-CAM
+
+    <br>
+
+    4 camere • Detectare mișcare PIR • Alerte Telegram
+
+</footer>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+
+    // ============================================
+    // IP-URILE CAMERELOR
+    // ============================================
+
+    const cameras = {
+
+        1: "10.106.32.152",
+
+        2: "10.106.32.37",
+
+        3: "10.106.32.134",
+
+        4: "10.106.32.107"
+
+    };
+
+
+    // ============================================
+    // CAMERA ONLINE
+    // ============================================
+
+    function cameraOnline(number) {
+
+        const status =
+            document.getElementById(
+                "status" + number
+            );
+
+
+        const offline =
+            document.getElementById(
+                "offline" + number
+            );
+
+
+        status.classList.remove(
+            "offline"
+        );
+
+
+        status.classList.add(
+            "online"
+        );
+
+
+        status.querySelector(
+            "span"
+        ).textContent = "ONLINE";
+
+
+        offline.style.display =
+            "none";
+
+
+        updateSystemStatus();
+
+    }
+
+
+    // ============================================
+    // CAMERA OFFLINE
+    // ============================================
+
+    function cameraOffline(number) {
+
+        const status =
+            document.getElementById(
+                "status" + number
+            );
+
+
+        const offline =
+            document.getElementById(
+                "offline" + number
+            );
+
+
+        status.classList.remove(
+            "online"
+        );
+
+
+        status.classList.add(
+            "offline"
+        );
+
+
+        status.querySelector(
+            "span"
+        ).textContent = "OFFLINE";
+
+
+        offline.style.display =
+            "flex";
+
+
+        updateSystemStatus();
+
+    }
+
+
+    // ============================================
+    // STATUS GENERAL
+    // ============================================
+
+    function updateSystemStatus() {
+
+        let onlineCount = 0;
+
+
+        for (
+            let i = 1;
+            i <= 4;
+            i++
+        ) {
+
+            const status =
+                document.getElementById(
+                    "status" + i
+                );
+
+
+            if (
+                status.classList.contains(
+                    "online"
+                )
+            ) {
+
+                onlineCount++;
+
+            }
+
+        }
+
+
+        const systemStatus =
+            document.getElementById(
+                "systemStatus"
+            );
+
+
+        const systemDot =
+            document.getElementById(
+                "systemDot"
+            );
+
+
+        if (
+            onlineCount === 4
+        ) {
+
+            systemStatus.textContent =
+                "Toate camerele sunt online";
+
+
+            systemDot.classList.add(
+                "active"
+            );
+
+        }
+
+        else if (
+            onlineCount > 0
+        ) {
+
+            systemStatus.textContent =
+                onlineCount +
+                "/4 camere online";
+
+
+            systemDot.classList.add(
+                "active"
+            );
+
+        }
+
+        else {
+
+            systemStatus.textContent =
+                "Camere offline";
+
+
+            systemDot.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+
+
+    // ============================================
+    // RECONETARE AUTOMATA
+    // ============================================
+
+    setInterval(
+
+        function() {
+
+            for (
+                let i = 1;
+                i <= 4;
+                i++
+            ) {
+
+                const status =
+                    document.getElementById(
+                        "status" + i
+                    );
+
+
+                if (
+                    status.classList.contains(
+                        "offline"
+                    )
+                ) {
+
+                    const image =
+                        document.getElementById(
+                            "camera" + i
+                        );
+
+
+                    image.src =
+                        "http://" +
+                        cameras[i] +
+                        "/stream?reload=" +
+                        Date.now();
+
+                }
+
+            }
+
+        },
+
+        5000
+
+    );
+
+
+    // ============================================
+    // INITIALIZARE
+    // ============================================
+
+    window.onload = function() {
+
+        updateSystemStatus();
+
+    };
+
+
+</script>
+
+
+</body>
+
+</html>
